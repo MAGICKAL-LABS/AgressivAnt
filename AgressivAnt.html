@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AgressivAnt</title>
+<style>
+:root{--bg:#f1e2c0;--ink:#3b2a20;--panel:#fff6e0;--line:#c9a870;--red:#b8372e;--mus:#e0a526;--wood:#8a5a33;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#2a1f19;--ink:#f3e4c6;--panel:#3d2d23;--line:#6b4f3a}}
+:root[data-theme="dark"]{--bg:#2a1f19;--ink:#f3e4c6;--panel:#3d2d23;--line:#6b4f3a}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.4 "Trebuchet MS","Segoe UI",system-ui,sans-serif;min-height:100%;-webkit-user-select:none;user-select:none}
+#app{max-width:640px;margin:0 auto;padding:0 10px 24px}
+header{display:flex;align-items:center;gap:10px;padding:10px 2px}
+h1{margin:0;font:900 26px/1 Georgia,"Palatino Linotype",serif;letter-spacing:-.5px;color:var(--red)}
+#date{flex:1;font-size:13px;opacity:.8;text-align:right}
+button{font:inherit;font-weight:700;border:0;border-radius:999px;padding:9px 18px;background:var(--mus);color:#3b2a20;cursor:pointer;box-shadow:0 3px 0 #a87a14;transition:transform .1s}
+button:active{transform:translateY(2px);box-shadow:0 1px 0 #a87a14}
+button.sec{background:var(--panel);color:var(--ink);box-shadow:0 3px 0 var(--line);border:2px solid var(--line)}
+button:disabled{opacity:.5}
+button:focus-visible{outline:3px solid var(--red);outline-offset:2px}
+#bubble{position:relative;background:#fffaf0;color:#3b2a20;border:3px solid #3b2a20;border-radius:22px;padding:12px 16px;min-height:74px;margin-bottom:16px;font-size:17px;font-weight:600}
+#bubble:after{content:"";position:absolute;left:44%;bottom:-17px;width:22px;height:22px;background:#fffaf0;border:solid #3b2a20;border-width:0 3px 3px 0;transform:rotate(45deg) skew(8deg,8deg)}
+#bubble small{display:block;font-weight:400;font-size:12px;opacity:.7;margin-bottom:3px}
+#bubble.pop{animation:pop .3s}
+@keyframes pop{0%{transform:scale(.94)}60%{transform:scale(1.03)}}
+#scene{border-radius:20px;overflow:hidden;border:3px solid #5c3d24;background:#e8cf9c;line-height:0}
+#scene svg{width:100%;height:auto}
+#ant{transform-origin:200px 215px;animation:br 3.2s ease-in-out infinite}
+@keyframes br{50%{transform:scaleY(1.02)}}
+#tail{transform-origin:270px 165px;animation:wag 2.4s ease-in-out infinite}
+@keyframes wag{50%{transform:rotate(8deg)}}
+#arm{animation:tap .6s ease-in-out infinite;display:none}
+.m-mad #arm,.m-slow #arm{display:block}
+@keyframes tap{50%{transform:translateY(-3px)}}
+#head{transform-origin:170px 120px;transition:transform .3s}
+.m-mad #head{transform:rotate(-6deg)}
+#brow{transform-box:fill-box;transform-origin:center;transition:transform .25s}
+.m-mad #brow{transform:rotate(-9deg)}.m-happy #brow{transform:rotate(10deg) translateY(-3px)}
+.mh,.mm,.tg{opacity:0}.mn{opacity:1}
+.m-happy .mh,.m-mad .mm{opacity:1}.m-happy .mn,.m-mad .mn{opacity:0}
+.m-happy .tg{opacity:1;animation:fl .5s 2}
+@keyframes fl{50%{transform:translateX(-8px)}}
+#pupil{animation:lk 4s infinite}
+@keyframes lk{0%,40%{transform:translateX(0)}50%,90%{transform:translateX(-3px)}}
+#lid{transform-box:fill-box;transform-origin:top;animation:bl 4.5s infinite}
+@keyframes bl{0%,94%,100%{transform:scaleY(0)}97%{transform:scaleY(1)}}
+.jump #ant{animation:jp .6s}.shake #ant{animation:sh .5s}
+@keyframes jp{40%{transform:translateY(-16px)}}
+@keyframes sh{20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(4px)}}
+#hud{display:flex;justify-content:space-between;align-items:center;font-size:14px;font-weight:700;padding:10px 4px 6px}
+.pips{display:flex;gap:5px}.pips i{width:14px;height:14px;border-radius:50%;background:var(--line)}.pips i.on{background:var(--red)}.pips i.done{background:var(--mus)}
+#counter{display:flex;flex-direction:column;align-items:center;gap:10px;padding:10px 0 4px}
+#plate{width:min(100%,400px);min-height:150px;border-radius:50%/44%;display:flex;flex-wrap:wrap;align-content:center;justify-content:center;gap:0 4px;padding:18px 34px;background:radial-gradient(#fffdf6 55%,#efe2c4 62%,#fffdf6 66%);border:6px solid #fff;box-shadow:0 8px 0 #c9b78f,0 12px 18px rgba(0,0,0,.25);color:#3b2a20;transition:transform .15s,box-shadow .15s;--k:.8}
+#plate:empty:before{content:"Drop ants here";margin:auto;font-style:italic;opacity:.4;font-size:15px}
+#plate.over{transform:scale(1.03);box-shadow:0 8px 0 #c9b78f,0 0 0 5px var(--mus)}
+#tray{background:linear-gradient(#7a4f2c,#654023);border-radius:18px;border:3px solid #4a2f18;min-height:130px;padding:12px;display:flex;flex-wrap:wrap;gap:6px 10px;justify-content:center;align-items:center;color:#f3e4c6;box-shadow:inset 0 4px 10px rgba(0,0,0,.35)}
+#tray:empty:before{content:"Pantry empty. He’ll find something to complain about.";font-size:13px;opacity:.7}
+.ant{--w:46px;width:calc(var(--w)*var(--k,1));touch-action:none;cursor:grab;line-height:0;transition:transform .12s;animation:pi .3s}
+.ant.s1{--w:62px}.ant.s2{--w:80px}.ant svg{width:100%;height:auto;display:block;pointer-events:none}
+.ant:hover{transform:translateY(-3px) rotate(-3deg)}.ant.lift{opacity:.3}
+.ant.eaten{transition:transform .5s,opacity .5s;transform:translateY(-50px) scale(.2);opacity:0}
+.ghost{position:fixed;z-index:99;pointer-events:none;transform:rotate(8deg) scale(1.15);filter:drop-shadow(0 8px 6px rgba(0,0,0,.35));--k:1}
+@keyframes pi{from{transform:scale(.4)}}
+#modal{position:fixed;inset:0;background:rgba(40,24,12,.62);display:none;align-items:center;justify-content:center;padding:14px;z-index:50}
+#modal.on{display:flex}
+#panel{background:var(--panel);color:var(--ink);border-radius:24px;border:3px solid var(--line);max-width:420px;width:100%;max-height:92vh;overflow:auto;padding:22px;text-align:center}
+#panel h2{font:900 26px Georgia,serif;margin:0 0 8px;color:var(--red)}
+#panel p{margin:8px 0}.row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:14px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}.grid div{background:var(--bg);border-radius:14px;padding:10px}.grid b{display:block;font:900 26px Georgia,serif}
+.sq{font-size:26px;letter-spacing:3px}.big{font:900 46px Georgia,serif;color:var(--red)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style></head><body>
+<div id="app">
+<header><h1>AgressivAnt</h1><span id="date"></span><button class="sec" id="statsBtn">Stats</button></header>
+<div id="bubble"></div>
+<div id="scene" class="m-n">
+<svg viewBox="0 0 400 260" role="img" aria-label="A grumpy anteater sitting at a restaurant counter">
+<defs><pattern id="st" width="40" height="10" patternUnits="userSpaceOnUse"><rect width="20" height="10" fill="#efdbae"/></pattern></defs>
+<rect width="400" height="260" fill="#e3c88f"/><rect width="400" height="200" fill="url(#st)"/>
+<rect x="0" y="198" width="400" height="62" fill="#6e4528"/>
+<g stroke="#5c3d24" stroke-width="2"><path d="M70 0v32M335 0v28"/></g>
+<path d="M45 32h50l-8 20H53zM310 28h50l-8 20h-34z" fill="#e0a526"/><circle cx="70" cy="58" r="14" fill="#ffe9a8" opacity=".5"/><circle cx="335" cy="54" r="14" fill="#ffe9a8" opacity=".5"/>
+<rect x="150" y="20" width="76" height="46" rx="4" fill="#2f3b34" stroke="#8a5a33" stroke-width="4"/><text x="188" y="40" font-size="11" fill="#f3e4c6" text-anchor="middle" font-family="Georgia">Tonight’s Special</text><text x="188" y="56" font-size="12" fill="#e0a526" text-anchor="middle" font-family="Georgia" font-weight="bold">ANTS (picky)</text>
+<rect x="18" y="86" width="58" height="62" rx="6" fill="#f2b45a" stroke="#8a5a33" stroke-width="4"/><path d="M47 86v62M18 117h58" stroke="#8a5a33" stroke-width="3"/>
+<ellipse cx="205" cy="222" rx="52" ry="12" fill="#b8372e"/><path d="M165 228L150 258M245 228l15 30M205 232v26" stroke="#3b2a20" stroke-width="5" stroke-linecap="round"/><path d="M150 250h110" stroke="#3b2a20" stroke-width="4"/>
+<g id="ant"><g id="tail"><path d="M265 170C310 160 360 110 345 60C320 90 300 100 262 120Z" fill="#5c3f2a"/></g>
+<ellipse cx="220" cy="165" rx="60" ry="60" fill="#a07c58"/><path d="M165 125Q225 135 275 195" stroke="#fff6e0" stroke-width="15" fill="none"/><path d="M165 125Q225 135 275 195" stroke="#2b1d14" stroke-width="8" fill="none"/>
+<ellipse cx="190" cy="215" rx="16" ry="9" fill="#7a5a3e"/><ellipse cx="238" cy="217" rx="16" ry="9" fill="#7a5a3e"/>
+<g id="head"><ellipse cx="165" cy="112" rx="37" ry="33" fill="#b08a66"/><circle cx="190" cy="84" r="13" fill="#8c6a4c"/><circle cx="190" cy="85" r="7" fill="#e9b4a0"/><path d="M148 96Q104 102 68 122Q54 134 68 146Q104 150 150 134Z" fill="#c8a47e"/><ellipse cx="64" cy="132" rx="9" ry="7" fill="#6b4435"/><ellipse cx="61" cy="129" rx="3" ry="2" fill="#fff" opacity=".6"/><circle cx="172" cy="128" r="9" fill="#f0a0a0" opacity=".55"/>
+<path class="tg" d="M70 144q-12 10 -26 4" stroke="#e58a8a" stroke-width="5" fill="none" stroke-linecap="round"/>
+<path class="mn" d="M80 141Q98 147 114 137" stroke="#2b1d14" stroke-width="2.5" fill="none" stroke-linecap="round"/><path class="mh" d="M80 138Q98 158 116 134" stroke="#2b1d14" stroke-width="2.5" fill="none"/><path class="mm" d="M80 146Q98 140 114 143" stroke="#2b1d14" stroke-width="2.5" fill="none"/>
+<circle cx="152" cy="104" r="12" fill="#fff"/><circle id="pupil" cx="149" cy="105" r="6.5" fill="#2b1d14"/><circle cx="146" cy="101" r="2.4" fill="#fff"/><ellipse id="lid" cx="152" cy="104" rx="12.5" ry="12.5" fill="#b08a66"/><line id="brow" x1="141" y1="87" x2="164" y2="87" stroke="#6b4c36" stroke-width="3" stroke-linecap="round"/></g>
+<path d="M150 148l36 -6l-4 38z" fill="#fffaf0" opacity=".9"/></g>
+<g id="arm"><ellipse cx="205" cy="190" rx="26" ry="9" fill="#8c6a4c"/></g>
+<rect x="0" y="186" width="400" height="14" rx="3" fill="#a8703d"/><rect x="0" y="186" width="400" height="5" fill="#c68a50"/>
+</svg></div>
+<div id="hud"><span id="cname"></span><span class="pips" id="pips"></span><span id="tm"></span></div>
+<div id="counter"><div id="plate"></div><button id="serve">Serve the plate</button></div>
+<div id="tray" style="margin-top:10px"></div>
+</div>
+<div id="modal"><div id="panel"></div></div>
+<script>
+"use strict";
+const $=s=>document.querySelector(s),KEY="agressivant.v1",NAMES=["Appetizer","Soup Course","Entrée","Palate Cleanser","Dessert"],COUNTS=[8,9,10,11,12];
+/* ---------- seeded daily puzzle ---------- */
+function rngFor(s){let h=2166136261;for(const ch of s){h^=ch.charCodeAt(0);h=Math.imul(h,16777619)}let a=h>>>0;return()=>{a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const AT={red:[a=>a.color==="red","red","c"],black:[a=>a.color==="black","black","c"],tiny:[a=>a.size===0,"tiny","s"],mid:[a=>a.size===1,"middling","s"],big:[a=>a.size===2,"hefty","s"],hat:[a=>a.hat,"hat-wearing","h"],bare:[a=>!a.hat,"bare-headed","h"],load:[a=>a.cargo,"cargo-hauling","l"],free:[a=>!a.cargo,"empty-handed","l"]};
+const GR={c:["red","black"],s:["tiny","mid","big"],h:["hat","bare"],l:["load","free"]};
+function genCourse(r,lv){
+ const pk=a=>a[Math.floor(r()*a.length)];
+ for(let t=0;t<500;t++){
+  const n=COUNTS[lv],ants=[];
+  for(let i=0;i<n;i++)ants.push({id:i,color:r()<.5?"red":"black",size:Math.floor(r()*3),hat:r()<.4,cargo:r()<.4,face:Math.floor(r()*3)});
+  const gs=Object.keys(GR).sort(()=>r()-.5),K=gs.map(g=>pk(GR[g])),W=k=>AT[k][1],T=(k,a)=>AT[k][0](a);
+  let test,h,cnt=true;
+  if(lv===0){test=a=>T(K[0],a);h=pk([`I’d prefer the ${W(K[0])} ones. Apparently that’s too much to ask.`,`You know, the ${W(K[0])} ants are perfectly fine. Just saying.`,`Only the ${W(K[0])} ones today. I shouldn’t have to explain.`]);cnt=false}
+  else if(lv===1){test=a=>T(K[0],a)&&T(K[1],a);h=pk([`I suppose the ${W(K[0])}, ${W(K[1])} ones are acceptable. Nothing else, naturally.`,`${W(K[0])} and ${W(K[1])}. Both. I don’t want to be difficult.`]);cnt=false}
+  else if(lv===2){test=a=>T(K[0],a)&&T(K[1],a)&&T(K[2],a);h=`The ${W(K[0])}, ${W(K[1])}, ${W(K[2])} ones. All three qualities, yes. Try to keep up.`}
+  else if(lv===3){test=a=>T(K[0],a)&&T(K[1],a)&&!T(K[2],a);h=pk([`The ${W(K[0])} ${W(K[1])} ones, please. But nothing ${W(K[2])}. I’d say “please” again, but I’m tired.`,`I won’t say I want the ${W(K[0])}, ${W(K[1])} ones. I’ll just say I’d be upset by anything ${W(K[2])}.`])}
+  else{test=a=>((T(K[0],a)&&T(K[1],a))||T(K[2],a))&&!T(K[3],a);h=`The ${W(K[0])}, ${W(K[1])} ones, and fine, any ${W(K[2])} ones too. But nothing ${W(K[3])}. Not even for you.`}
+  const ans=ants.filter(test).map(a=>a.id);
+  if(ans.length<1||ans.length>(lv>2?6:5)||ans.length>n-2)continue;
+  if(cnt)h+=` Exactly ${ans.length}, since counting is apparently hard.`;
+  return{ants,ans,hint:h,n:ans.length,cnt}
+ }
+}
+function genDay(date){const r=rngFor("agressivant|"+date);return[0,1,2,3,4].map(i=>genCourse(r,i))}
+/* ---------- ants ---------- */
+function antSVG(a){const c=a.color==="red"?"#b8372e":"#2b2220",hi=a.color==="red"?"#e0675a":"#5a4a44";
+ const mouth=["M13 38q4 4 8 0","M13 38h8","M13 40q4 -4 8 0"][a.face];
+ let s=`<svg viewBox="0 0 80 64">`;
+ for(const x of[28,38,48])s+=`<path d="M${x} 38l-9 15M${x} 38l9 15" stroke="${c}" stroke-width="2.6" stroke-linecap="round" fill="none"/>`;
+ s+=`<path d="M16 26Q10 14 3 14M21 25Q19 12 12 7" stroke="${c}" stroke-width="2" fill="none" stroke-linecap="round"/>`;
+ if(a.cargo)s+=`<path d="M38 33L46 24" stroke="${c}" stroke-width="2.4" stroke-linecap="round"/><ellipse cx="52" cy="20" rx="12" ry="6" fill="#5c9a3c" transform="rotate(-18 52 20)"/><path d="M42 24L62 15" stroke="#3d7326" stroke-width="1.2"/>`;
+ s+=`<ellipse cx="53" cy="37" rx="16" ry="11" fill="${c}"/><ellipse cx="46" cy="33" rx="8" ry="3.5" fill="${hi}" opacity=".6"/><ellipse cx="34" cy="36" rx="9" ry="7" fill="${c}"/><ellipse cx="20" cy="32" rx="11" ry="9.5" fill="${c}"/>`;
+ s+=`<circle cx="17" cy="30" r="3.4" fill="#fff"/><circle cx="16" cy="30.5" r="1.7" fill="#111"/><path d="${mouth}" stroke="#fff" stroke-width="1.3" fill="none" stroke-linecap="round" opacity=".85"/>`;
+ if(a.hat)s+=`<rect x="12" y="7" width="17" height="14" rx="2" fill="#3b2a20"/><rect x="12" y="16" width="17" height="3.5" fill="#e0a526"/><rect x="8" y="21" width="25" height="3.5" rx="1.7" fill="#3b2a20"/>`;
+ return s+`</svg>`}
+/* ---------- storage ---------- */
+let store;try{store=JSON.parse(localStorage.getItem(KEY))||{}}catch(e){store={}}store.days=store.days||{};
+function save(){try{localStorage.setItem(KEY,JSON.stringify(store))}catch(e){}}
+function dk(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+const TODAY=dk(new Date());
+const D=store.days[TODAY]=store.days[TODAY]||{course:0,mis:[0,0,0,0,0],ct:[0,0,0,0,0],sc:[],done:false};
+const P=genDay(TODAY);
+const tot=()=>D.sc.reduce((a,b)=>a+b,0),secs=()=>D.ct.reduce((a,b)=>a+b,0)/1000,fmt=s=>{s=Math.floor(s);return Math.floor(s/60)+":"+String(s%60).padStart(2,"0")};
+function stats(){const ks=Object.keys(store.days).sort(),pl=ks.length,dn=ks.filter(k=>store.days[k].done);let st=0,d=new Date();if(!(store.days[dk(d)]||{}).done)d.setDate(d.getDate()-1);while((store.days[dk(d)]||{}).done){st++;d.setDate(d.getDate()-1)}
+ return{pl,dn:dn.length,pct:pl?Math.round(dn.length/pl*100):0,st,best:dn.reduce((m,k)=>Math.max(m,store.days[k].sc.reduce((a,b)=>a+b,0)),0)}}
+/* ---------- dialogue ---------- */
+const pk=a=>a[Math.floor(Math.random()*a.length)];
+const L={ok1:["Finally. Someone who understands fine dining.","Well, look at that. Competence. Delicious.","Flawless. I’m almost suspicious."],ok2:["Eventually correct. Like a stopped clock.","Fine. I’ll eat it. Don’t get cocky.","It only took a few tries. Adequate."],close:["So close. And yet, here we are.","One ant off. It’s the little things that ruin a meal.","Almost. Which is just a polite word for wrong."],wrong:["Interesting choice. Not the one I asked for, but interesting.","Is this a joke? The ants aren’t laughing.","I said what I said. Reread it. Slowly."],far:["That’s not a neighborhood miss. That’s a different continent.","Did you read the bubble or just admire it?","I’ve had better service from a rock."],empty:["An empty plate. Bold. Minimalist. Still hungry.","Nothing? I’m starving, not a philosopher."],slow:["Take your time. I wasn’t planning on living forever.","I’ve aged since the last ant. Don’t mind me.","Any day now. Any decade."],
+f3:["Three stars. Do not let it go to your head. It’s a small head.","Magnificent. I’ll be telling the other anteaters. Reluctantly."],f2:["Acceptable. Like lukewarm soup, but with ants.","You’ll do. Come back tomorrow. Try harder."],f1:["I’ve survived worse. Barely. Dramatically.","Passable, if you squint and lower your standards."],f0:["That was a crime scene with a tip jar. See you tomorrow.","I’ll be leaving a review. It will have a lot of adjectives."]};
+/* ---------- game ---------- */
+let idx=0,ants=[],active=false,lastAct=Date.now(),slowSaid=false,last=Date.now(),drag=null,tick=0;
+const bub=$("#bubble"),scene=$("#scene"),plate=$("#plate"),tray=$("#tray"),modal=$("#modal"),panel=$("#panel");
+function mood(m,fx){scene.className="m-"+m;if(fx){scene.classList.add(fx);setTimeout(()=>scene.classList.remove(fx),700)}}
+function say(t,m,fx,lab){bub.innerHTML=(lab?`<small>${lab}</small>`:"")+t;bub.classList.remove("pop");void bub.offsetWidth;bub.classList.add("pop");mood(m||"n",fx)}
+function showHint(){const c=P[idx];let t=c.hint;if(!c.cnt&&D.mis[idx]>=2)t+=` <i>(He sighs. “${c.n} ants. Count them.”)</i>`;say(t,D.mis[idx]?"mad":"n",null,`Course ${idx+1} of 5 · ${NAMES[idx]}`)}
+function hud(){$("#cname").textContent=NAMES[Math.min(idx,4)];$("#tm").textContent=fmt(secs())+" · ✗ "+D.mis.reduce((a,b)=>a+b,0);$("#pips").innerHTML=[0,1,2,3,4].map(i=>`<i class="${i<idx?"done":i===idx?"on":""}"></i>`).join("")}
+function startCourse(){const c=P[idx];plate.innerHTML=tray.innerHTML="";ants=c.ants.map(a=>{const el=document.createElement("div");el.className="ant s"+a.size;el.dataset.id=a.id;el.innerHTML=antSVG(a);return{id:a.id,on:false,el}});render();slowSaid=false;lastAct=Date.now();active=true;showHint();hud()}
+function render(){ants.forEach(a=>{const p=a.on?plate:tray;if(a.el.parentNode!==p){p.appendChild(a.el);a.el.style.animation="none";void a.el.offsetWidth;a.el.style.animation=""}})}
+function serve(){if(!active)return;lastAct=Date.now();const on=ants.filter(a=>a.on).map(a=>a.id),ans=P[idx].ans;
+ if(!on.length){say(pk(L.empty),"mad","shake");return}
+ const diff=on.filter(i=>!ans.includes(i)).length+ans.filter(i=>!on.includes(i)).length;
+ if(!diff){active=false;const m=D.mis[idx],bonus=ans.length*5,s=Math.max(25,100-25*m)+Math.max(0,40-Math.floor(D.ct[idx]/1500))+bonus;D.sc[idx]=s;D.course=idx+1;save();
+  plate.querySelectorAll(".ant").forEach(e=>e.classList.add("eaten"));say(pk(m?L.ok2:L.ok1),"happy","jump");hud();
+  setTimeout(()=>{idx++;if(idx>4)finish();else{startCourse()}},2600)}
+ else{D.mis[idx]++;save();hud();say(pk(diff===1?L.close:diff>3?L.far:L.wrong),"mad","shake");setTimeout(()=>{if(active&&!scene.classList.contains("jump"))showHintSoft()},3200)}}
+function showHintSoft(){if(active)showHint()}
+function finish(){D.done=true;D.course=5;save();hud();mood("happy");setTimeout(results,600)}
+/* ---------- drag & drop ---------- */
+document.addEventListener("pointerdown",e=>{const el=e.target.closest(".ant");if(!el||!active||el.classList.contains("ghost"))return;drag={el,x:e.clientX,y:e.clientY,moved:false};lastAct=Date.now()});
+document.addEventListener("pointermove",e=>{if(!drag)return;if(!drag.moved&&Math.hypot(e.clientX-drag.x,e.clientY-drag.y)>6){drag.moved=true;const g=drag.el.cloneNode(true);g.classList.add("ghost");g.style.width=drag.el.offsetWidth*1.1+"px";document.body.appendChild(g);drag.g=g;drag.el.classList.add("lift")}
+ if(drag.g){drag.g.style.left=e.clientX-drag.g.offsetWidth/2+"px";drag.g.style.top=e.clientY-drag.g.offsetHeight/2+"px";const r=plate.getBoundingClientRect();plate.classList.toggle("over",hit(r,e))}});
+const hit=(r,e,m=12)=>e.clientX>r.left-m&&e.clientX<r.right+m&&e.clientY>r.top-m&&e.clientY<r.bottom+m;
+function endDrag(e){if(!drag)return;const a=ants.find(x=>x.el===drag.el);drag.el.classList.remove("lift");plate.classList.remove("over");
+ if(drag.moved){drag.g.remove();if(hit(plate.getBoundingClientRect(),e))a.on=true;else if(hit(tray.getBoundingClientRect(),e,30))a.on=false}else a.on=!a.on;
+ drag=null;render()}
+document.addEventListener("pointerup",endDrag);document.addEventListener("pointercancel",()=>{if(drag){drag.g&&drag.g.remove();drag.el.classList.remove("lift");drag=null}});
+/* ---------- modals ---------- */
+function open(h){panel.innerHTML=h;modal.classList.add("on")}function close(){modal.classList.remove("on")}
+function cd(){const n=new Date(),t=new Date(n.getFullYear(),n.getMonth(),n.getDate()+1),s=Math.floor((t-n)/1e3);return[Math.floor(s/3600),Math.floor(s%3600/60),s%60].map(v=>String(v).padStart(2,"0")).join(":")}
+function showStats(){const s=stats();open(`<h2>Your record</h2><div class="grid"><div><b>${s.pl}</b>Games played</div><div><b>${s.pct}%</b>Completion rate</div><div><b>${s.st}</b>Day streak</div><div><b>${s.best}</b>Best score</div></div><p>Next menu in <b class="cdw">${cd()}</b></p><div class="row"><button id="x">Back to the bar</button></div>`);$("#x").onclick=()=>{close();if(D.done)results()}}
+function rating(t){return t>=600?["Michelin Mandible ★★★","f3"]:t>=460?["Respectable Regular ★★","f2"]:t>=320?["Tolerated Tipper ★","f1"]:["Health Code Violation","f0"]}
+function squares(){return D.mis.map(m=>m===0?"🟩":m===1?"🟨":m===2?"🟧":"🟥").join("")}
+function results(){const t=tot(),[r,k]=rating(t),m=D.mis.reduce((a,b)=>a+b,0);
+ open(`<h2>Check, please</h2><div class="big">${t}</div><p><b>${r}</b></p><div class="sq">${squares()}</div><div class="grid"><div><b>${fmt(secs())}</b>Time</div><div><b>${m}</b>Mistakes</div></div><p><i>“${L[k][t%L[k].length]}”</i></p><p>Next menu in <b class="cdw">${cd()}</b></p><div class="row"><button id="sh">Share result</button><button class="sec" id="st2">Stats</button></div><p id="shm" style="font-size:13px"></p>`);
+ $("#st2").onclick=showStats;
+ $("#sh").onclick=()=>{const tx=`AgressivAnt 🐜 ${TODAY}\n${squares()}\nScore ${t} · ${fmt(secs())} · ${m} mistake${m===1?"":"s"}\n${r}`;(navigator.clipboard?navigator.clipboard.writeText(tx):Promise.reject()).then(()=>$("#shm").textContent="Copied. No spoilers inside.",()=>{$("#shm").textContent=tx})}}
+function begin(txt,btn){open(`<h2>AgressivAnt</h2><p>${txt}</p><p style="font-size:14px">Read his hints. Drag (or tap) the ants he actually wants onto the plate, then serve it. Exactly the right ants, no more, no fewer. Five courses, one menu a day.</p><div class="row"><button id="go">${btn}</button></div>`);$("#go").onclick=()=>{close();last=Date.now();idx=Math.min(D.course,4);startCourse()}}
+/* ---------- init ---------- */
+$("#date").textContent=new Date().toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric",year:"numeric"});
+$("#serve").onclick=serve;$("#statsBtn").onclick=showStats;
+setInterval(()=>{const n=Date.now(),dt=n-last;last=n;document.querySelectorAll(".cdw").forEach(e=>e.textContent=cd());
+ if(active&&!document.hidden){D.ct[idx]+=Math.min(dt,2000);hud();if(++tick%10===0)save();
+  if(!slowSaid&&n-lastAct>40000){slowSaid=true;say(pk(L.slow),"mad")}}},1000);
+window.addEventListener("pagehide",save);
+if(!D.done){idx=Math.min(D.course,4);startCourse();active=false;say("Sit. I’ll tell you what I want when you’re ready.","n")}
+if(D.done){idx=4;hud();say("Dinner’s over. Come back tomorrow, if you must.","n");setTimeout(results,150)}
+else if(D.course>0||secs()>0)begin("Oh. You’re back. The ants were getting cold.","Resume dinner");
+else begin("Welcome. I’m the anteater. I’m not hungry for just any ant. I’m hungry for the right ants. Try to keep up.","Take a seat");
+</script></body></html>
